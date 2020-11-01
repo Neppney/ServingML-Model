@@ -1,2 +1,2 @@
 # ServingML_Model
-Cloud computing final team project
+Cloud computing team project
