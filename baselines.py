@@ -92,7 +92,7 @@ def train(args):
     # dev_fold = [-1]*len(data_train) + [0]*len(data_dev)
     # x_traindev, y_traindev = data_merge["text"].to_numpy(), data_merge["label"].to_numpy()
 
-    x_traindev, y_traindev = data_train["text"].to_numpy(), data_train["label"].to_numpy()
+    x_traindev, y_traindev = data_train["Date"].to_numpy(), data_train["Open"].to_numpy()
     pipeline, parameters = build_cls(args.ml_cls, args.tfidf, args.use_hash, args.scaler)
 
     print("- Train the baseline...")
@@ -137,7 +137,7 @@ def evaluate(data, model_name):
 
 def test(args, model_name):
     data_test = pd.read_csv(args.test_file).sample(frac=1).reset_index(drop=True)
-    x_test, y_test = data_test["text"].to_numpy(), data_test["label"].to_numpy()
+    x_test, y_test = data_test["Date"].to_numpy(), data_test["Open"].to_numpy()
     mtrcs = evaluate([x_test, y_test], model_name)
     return mtrcs
 
@@ -167,11 +167,11 @@ if __name__ == '__main__':
     """
     argparser = argparse.ArgumentParser(sys.argv[0])
 
-    argparser.add_argument('--train_file', help='Trained file', default="../data/smsspamcollection/train.csv", type=str)
+    argparser.add_argument('--train_file', help='Trained file', default="data/dji/train.csv", type=str)
 
-    argparser.add_argument('--dev_file', help='Developed file', default="../data/smsspamcollection/test.csv", type=str)
+    argparser.add_argument('--dev_file', help='Developed file', default="data/dji/test.csv", type=str)
 
-    argparser.add_argument('--test_file', help='Tested file', default="../data/smsspamcollection/test.csv", type=str)
+    argparser.add_argument('--test_file', help='Tested file', default="data/dji/test.csv", type=str)
 
     argparser.add_argument("--tfidf", action='store_true', default=False, help="tfidf flag")
 
@@ -179,9 +179,9 @@ if __name__ == '__main__':
 
     argparser.add_argument("--scaler", action='store_true', default=False, help="scale flag")
 
-    argparser.add_argument('--ml_cls', help='Machine learning classifier', default="MLP", type=str)
+    argparser.add_argument('--ml_cls', help='Machine learning classifier', default="NB", type=str)
 
-    argparser.add_argument('--model_dir', help='Model dir', default="../data/smsspamcollection/", type=str)
+    argparser.add_argument('--model_dir', help='Model dir', default="data/dji/", type=str)
 
     args = argparser.parse_args()
 
