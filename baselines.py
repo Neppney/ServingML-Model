@@ -93,7 +93,7 @@ def train(args):
     # x_traindev, y_traindev = data_merge["text"].to_numpy(), data_merge["label"].to_numpy()
 
     x_traindev, y_traindev = data_train["Date"].to_numpy(), data_train["Open"].to_numpy()
-    pipeline, parameters = build_cls(args.ml_cls, args.tfidf, args.use_hash, args.scaler)
+    pipeline, parameters = build_cls(args.ml_cls, args.tfidf, True, args.scaler)
 
     print("- Train the baseline...")
     start = time.time()
