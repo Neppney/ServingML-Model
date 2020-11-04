@@ -5,6 +5,7 @@ import sys
 import time
 
 import pandas as pd
+import numpy as np
 from sklearn import metrics
 from sklearn.ensemble import AdaBoostClassifier, GradientBoostingClassifier, RandomForestClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer, HashingVectorizer
@@ -17,7 +18,8 @@ from sklearn.neighbors import KNeighborsClassifier  # k-NN
 from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
-from sklearn.svm import LinearSVC  # linear SVM
+from sklearn.preprocessing import LabelEncoder
+from sklearn.svm import LinearSVC, SVC  # linear SVM
 from sklearn.tree import DecisionTreeClassifier  # DT
 
 
@@ -59,13 +61,13 @@ def build_cls(ml_cls="NB", tfidf=False, use_hash=False, scaler=False):
         # DEFAULT: NB
         classifier = MultinomialNB()
     settings = []
-    if use_hash:
-        settings = [('vectorizer', HashingVectorizer())]
-    elif tfidf:
-        settings = [('vectorizer', TfidfVectorizer())]
-    else:
-        # DEFAULT: BOW counting
-        settings = [('vectorizer', CountVectorizer())]
+    # if use_hash:
+    #     settings = [('vectorizer', HashingVectorizer())]
+    # elif tfidf:
+    #     settings = [('vectorizer', TfidfVectorizer())]
+    # else:
+    #     # DEFAULT: BOW counting
+    #     settings = [('vectorizer', CountVectorizer())]
 
     # scaler cannot use with NB (MultinomialNB)
     if scaler and ml_cls != "NB":
@@ -74,12 +76,19 @@ def build_cls(ml_cls="NB", tfidf=False, use_hash=False, scaler=False):
     settings += [('classifier', classifier)]
     model = Pipeline(settings)
 
-    parameters = {'vectorizer__analyzer': ['word'],
-                  # 'vectorizer__analyzer': ['char', 'word'],
-                  'vectorizer__ngram_range': [(1, 5)],
-                  'vectorizer__min_df': [3, 5, 7],
-                  'vectorizer__binary': (True, False)
-                  }
+    for key in model.get_params():
+        print(key)
+    print(model.get_params())
+    # parameters = {  # 'vectorizer__analyzer': ['word'],
+    #     # 'vectorizer__analyzer': ['char', 'word'],
+    #     'vectorizer__ngram_range': [(1, 5)],
+    #     'vectorizer__min_df': [3, 5, 7],
+    #     'vectorizer__binary': (True, False)
+    # }
+
+    # parameters = {'vectorizer__kernel': ['linear', 'rbf'], 'vectorizer__C': [1, 10]}
+    parameters = {'kernel': ['linear'], 'C': [1, 10]}
+
     end = time.time()
     print("\t+ Done: %.4f(s)" % (end - start))
     return model, parameters
@@ -87,20 +96,25 @@ def build_cls(ml_cls="NB", tfidf=False, use_hash=False, scaler=False):
 
 def train(args):
     data_train = pd.read_csv(args.train_file).sample(frac=1).reset_index(drop=True)
+    data_train.
     # data_dev = pd.read_csv(args.dev_file).sample(frac=1).reset_index(drop=True)
     # data_merge = pd.concat([data_train, data_dev])
     # dev_fold = [-1]*len(data_train) + [0]*len(data_dev)
     # x_traindev, y_traindev = data_merge["text"].to_numpy(), data_merge["label"].to_numpy()
+    x_traindev, y_traindev = np.array(data_train["Date"]), np.array(data_train["Open"])
+    X = np.vstack((x_traindev, y_traindev)).T
+    y_traindev = LabelEncoder().fit_transform(y_traindev)
 
-    x_traindev, y_traindev = data_train["Date"].to_numpy(), data_train["Open"].to_numpy()
-    pipeline, parameters = build_cls(args.ml_cls, args.tfidf, True, args.scaler)
+    pipeline, parameters = build_cls(args.ml_cls, args.tfidf, args.use_hash, args.scaler)
+    # pipeline, parameters = build_cls("MLP", True, False, True)
+    # print(pipeline.get_params().keys())
 
     print("- Train the baseline...")
     start = time.time()
     # model = GridSearchCV(pipeline, parameters, cv=PredefinedSplit(test_fold=dev_fold),
     #                      verbose=5,  scoring='f1_weighted')
-    model = GridSearchCV(pipeline, parameters, cv=5, verbose=5, scoring='f1_weighted')
-    model.fit(x_traindev, y_traindev)
+    model = GridSearchCV(pipeline, parameters, cv=2, verbose=5, scoring='f1_weighted')
+    model.fit(X, y_traindev)
     end = time.time()
     print("\t+ Done: %.4f(s)" % (end - start))
     best_model = model.best_estimator_
@@ -173,13 +187,13 @@ if __name__ == '__main__':
 
     argparser.add_argument('--test_file', help='Tested file', default="data/dji/test.csv", type=str)
 
-    argparser.add_argument("--tfidf", action='store_true', default=False, help="tfidf flag")
+    argparser.add_argument("--tfidf", action='store_true', default=True, help="tfidf flag")
 
     argparser.add_argument("--use_hash", action='store_true', default=False, help="hashing flag")
 
     argparser.add_argument("--scaler", action='store_true', default=False, help="scale flag")
 
-    argparser.add_argument('--ml_cls', help='Machine learning classifier', default="NB", type=str)
+    argparser.add_argument('--ml_cls', help='Machine learning classifier', default="SVM", type=str)
 
     argparser.add_argument('--model_dir', help='Model dir', default="data/dji/", type=str)
 
