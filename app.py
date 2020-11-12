@@ -1,7 +1,13 @@
 from flask import Flask, render_template
 
+import os
+import sys
+import argparse
+from model import load
+
 app = Flask(__name__)
 
+model_api = load()
 
 @app.route('/')
 def outline():
@@ -9,7 +15,7 @@ def outline():
 
 
 @app.route('/team')
-def showTeam():
+def show_team():
     return render_template('team.html')
 
 
@@ -19,7 +25,7 @@ def infer():
 
 
 @app.route('/sqlFunctionality')
-def sqlFunctionality():
+def sql_functionality():
     return render_template('sqlStoreRetrieve.html')
 
 
