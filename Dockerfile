@@ -1,6 +1,5 @@
 ### Mostly Finished Dockerfile ###
 
-
 # set base image (host os)
 FROM python:3.8
 

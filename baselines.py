@@ -96,7 +96,7 @@ def build_cls(ml_cls="NB", tfidf=False, use_hash=False, scaler=False):
 
 def train(args):
     data_train = pd.read_csv(args.train_file).sample(frac=1).reset_index(drop=True)
-    data_train.
+    # data_train.
     # data_dev = pd.read_csv(args.dev_file).sample(frac=1).reset_index(drop=True)
     # data_merge = pd.concat([data_train, data_dev])
     # dev_fold = [-1]*len(data_train) + [0]*len(data_dev)
