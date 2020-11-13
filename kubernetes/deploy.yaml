@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: final-project
+  name: final-project
+  namespace: default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: final-project
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: final-project
+    spec:
+      containers:
+        - image: >-
+            gcr.io/comp4312-mlmodel-kubernetes/github.com/neppney/servingml-model
+          imagePullPolicy: IfNotPresent
+          name: servingml-model
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: final-project
+  namespace: default
+spec:
+  maxReplicas: 5
+  metrics:
+    - resource:
+        name: cpu
+        targetAverageUtilization: 80
+      type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: final-project
