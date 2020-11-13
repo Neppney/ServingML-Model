@@ -4,9 +4,10 @@
 # set base image (host os)
 FROM python:3.8
 
+# Not needed
 # set the environment variable to the private key user json file
 # this environment variable is needed so google functions can access my project
-ENV GOOGLE_APPLICATION_CREDENTIALS=/tmp/keys/access.json
+# ENV GOOGLE_APPLICATION_CREDENTIALS=/tmp/keys/access.json
 
 # set the working directory in the container
 WORKDIR /code
