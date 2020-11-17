@@ -6,30 +6,25 @@
 
 {% block content %}
     <h1>Inference</h1>
-    <form method="post">
-        <div class="form-group">
-            <label for="input">Input Text</label>
-            <input type="text" name="input"
-                   placeholder="reply to win £100 weekly!" class="form-control"
-                   value="{{ request.form['input'] }}"></input>
-        </div>
-        <div class="form-group">
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </div>
-        <div class="form-group">
-            <label for="content">Text Content</label>
-            <textarea name="content" placeholder="NA"
-                      class="form-control">{{ request.form['input'] }}</textarea>
-        </div>
-        <div class="form-group">
-            <label for="label">Predicted Label</label>
-            <textarea name="label" placeholder="Post label"
-                      class="form-control">{{ label }}</textarea>
-        </div>
-        <div class="form-group">
-            <label for="prob">Predicted Probability</label>
-            <textarea name="prob" placeholder="Post prob"
-                      class="form-control">{{ prob }}</textarea>
-        </div>
-    </form>
+    <section>
+        <form method ="POST" action="http://127.0.0.1:8080/inference">
+            <div>
+                <label for="input"> 
+                    ENTER DATE FROM 40000+
+                </label>
+               <P><input type= "text" name="date"></P> 
+               <p><input type="submit" value="SUBMIT DATE"></p>
+            </div>
+            <div>
+                <label for="input"> 
+                    THE STOCK PRICE WOULD BE:
+                </label>
+               <p>${{ price }}</p>
+               <label for="input"> 
+                    THE ACCURACY OF THE DATA IS: 
+                </label>
+               <p>{{ accuracy }}</p>
+                </div>
+        </form>
+    </section>
 {% endblock %}
