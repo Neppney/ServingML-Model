@@ -49,7 +49,7 @@ def test_model(data, model):
 # Function for predicting future values :
 def predict(date):
     model = load()
-    predicted_value = date * model.coef_[0][0] + model.intercept_[0]
+    predicted_value = float(date) * model.coef_[0][0] + model.intercept_[0]
     return predicted_value
 
 
@@ -66,15 +66,24 @@ def load():
     return model
 
 
-if __name__ == '__main__':
+#if __name__ == '__main__':
+#    train_file = 'data/dji/train.csv'
+#    test_file = 'data/dji/test.csv'
+
+#    model = create_model(train_file)
+#    test_model(test_file, model)
+
+#    prediction_date = 45000
+#    price_prediction = predict(prediction_date)
+#    print("Estimated price: ", price_prediction)
+
+def search(prediction_date):
     train_file = 'data/dji/train.csv'
     test_file = 'data/dji/test.csv'
 
     model = create_model(train_file)
     test_model(test_file, model)
-
-    prediction_date = 45000
     price_prediction = predict(prediction_date)
+      
     print("Estimated price: ", price_prediction)
-
-
+    return price_prediction
