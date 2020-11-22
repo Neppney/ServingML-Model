@@ -1,18 +1,20 @@
 import logging
 import random
-
 import sqlalchemy
-from flask import Flask, render_template, request, render_template, flash, redirect, url_for
-from numpy.testing._private.utils import measure
+from flask import Flask, render_template, request, render_template, flash, redirect, url_for, Response
+
 from model import *
 from baselines import *
-from model import load
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'comp4312'
 
 logger = logging.getLogger()
 
+DB_USER = 'root'
+DB_PASS = 'team11DataBases'
+DB_NAME = 'cc_final_database'
 
 def init_connection_engine():
     db_config = {
@@ -42,12 +44,13 @@ def init_connection_engine():
         # [END cloud_sql_mysql_sqlalchemy_lifetime]
     }
 
-    if os.environ.get("DB_HOST"):
-        return init_tcp_connection_engine(db_config)
-    else:
-        return init_unix_connection_engine(db_config)
+    # if os.environ.get("DB_HOST"):
+    #     return init_tcp_connection_engine(db_config)
+    # else:
+    #     return init_unix_connection_engine(db_config)
 
-    # return init_tcp_connection_engine(db_config)
+    # to run locally use tcp
+    return init_tcp_connection_engine(db_config)
     # return init_unix_connection_engine(db_config)
 
 
@@ -56,15 +59,15 @@ def init_tcp_connection_engine(db_config):
     # Remember - storing secrets in plaintext is potentially unsafe. Consider using
     # something like https://cloud.google.com/secret-manager/docs/overview to help keep
     # secrets secret.
-    db_user = os.environ["DB_USER"]
-    db_pass = os.environ["DB_PASS"]
-    db_name = os.environ["DB_NAME"]
-    db_host = os.environ["DB_HOST"]
-    # db_user = 'root'
-    # db_pass = 'team11DataBases'
-    # db_name = 'cc_final_database'
-    # db_host = '127.0.0.1'
-    db_port = os.environ['DB_HOST']
+    # db_user = os.environ["DB_USER"]
+    # db_pass = os.environ["DB_PASS"]
+    # db_name = os.environ["DB_NAME"]
+    # db_host = os.environ["DB_HOST"]
+    db_user = 'root'
+    db_pass = 'team11DataBases'
+    db_name = 'cc_final_database' # name of database you created in cloud sql
+    db_host = '127.0.0.1' # where the proxy is running
+    # db_port = os.environ['DB_HOST']
 
     # Extract host and port from db_host
     # host_args = db_host.split(":")
@@ -78,7 +81,7 @@ def init_tcp_connection_engine(db_config):
             username=db_user,  # e.g. "my-database-user"
             password=db_pass,  # e.g. "my-database-password"
             host=db_host,  # e.g. "127.0.0.1"
-            port=int(db_port),  # e.g. 3306
+            port=3306,  # e.g. 3306
             database=db_name,  # e.g. "my-database-name"
         ),
         # ... Specify additional properties here.
@@ -96,10 +99,10 @@ def init_unix_connection_engine(db_config):
     # Remember - storing secrets in plaintext is potentially unsafe. Consider using
     # something like https://cloud.google.com/secret-manager/docs/overview to help keep
     # secrets secret.
-    db_user = os.environ["DB_USER"]
-    db_pass = os.environ["DB_PASS"]
-    db_name = os.environ["DB_NAME"]
-    print("Using: {} | {} | {}".format(db_user, db_pass, db_name))
+    # db_user = os.environ["DB_USER"] # environemnet variables are grabbed from the yaml file when launching in kubernetes
+    # db_pass = os.environ["DB_PASS"]
+    # db_name = os.environ["DB_NAME"]
+    # print("Using: {} | {} | {}".format(db_user, db_pass, db_name))
     db_socket_dir = os.environ.get("DB_SOCKET_DIR", "/cloudsql")
     cloud_sql_connection_name = os.environ["CLOUD_SQL_CONNECTION_NAME"]
 
@@ -108,9 +111,9 @@ def init_unix_connection_engine(db_config):
         # mysql+pymysql://<db_user>:<db_pass>@/<db_name>?unix_socket=<socket_path>/<cloud_sql_instance_name>
         sqlalchemy.engine.url.URL(
             drivername="mysql+pymysql",
-            username=db_user,  # e.g. "my-database-user"
-            password=db_pass,  # e.g. "my-database-password"
-            database=db_name,  # e.g. "my-database-name"
+            username=DB_USER,  # e.g. "my-database-user"
+            password=DB_PASS,  # e.g. "my-database-password"
+            database=DB_NAME,  # e.g. "my-database-name"
             query={
                 "unix_socket": "{}/{}".format(
                     db_socket_dir,  # e.g. "/cloudsql"
@@ -129,21 +132,22 @@ def init_unix_connection_engine(db_config):
 
 # The SQLAlchemy engine will help manage interactions, including automatically
 # managing a pool of connections to your database
-db = init_connection_engine()
+
+# db = init_connection_engine()
 
 
-@app.before_first_request
-def create_table():
-    # Create tables (if they don't already exist)
-    with db.connect() as conn:
-        conn.execute(
-            "CREATE TABLE IF NOT EXISTS entry ("
-            "entry_id SERIAL NOT NULL AUTO_INCREMENT,"
-            "date INTEGER,"
-            "predicted_price FLOAT,"
-            "predicted_accuracy FLOAT DEFAULT 90.22,"
-            "PRIMARY KEY ( entry_id )); "
-        )
+# @app.before_first_request
+# def create_table():
+#     # Create tables (if they don't already exist)
+#     with db.connect() as conn:
+#         conn.execute(
+#             "CREATE TABLE IF NOT EXISTS entry ("
+#             "entry_id SERIAL NOT NULL AUTO_INCREMENT,"
+#             "date INTEGER,"
+#             "predicted_price FLOAT,"
+#             "predicted_accuracy FLOAT DEFAULT 90.22,"
+#             "PRIMARY KEY ( entry_id )); "
+#         )
 
 @app.route('/')
 def outline():
