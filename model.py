@@ -1,13 +1,8 @@
 import pandas as pd
 import numpy as np
 import pickle
-import matplotlib.pyplot as plt
 from sklearn import linear_model
 from sklearn.metrics import r2_score
-from sklearn.svm import LinearSVC
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
-from sklearn.datasets import make_classification
 
 
 def pkl_write(data, filename='data/dji/data.pickle'):
@@ -60,7 +55,7 @@ def save(model):
 
 
 def load():
-    print("- Load the model...")
+    print("- Loading the model...")
     model = pkl_read()
     print("\t+ Done.")
     return model
@@ -77,13 +72,13 @@ def load():
 #    price_prediction = predict(prediction_date)
 #    print("Estimated price: ", price_prediction)
 
-def search(prediction_date):
-    train_file = 'data/dji/train.csv'
-    test_file = 'data/dji/test.csv'
-
-    model = create_model(train_file)
-    test_model(test_file, model)
-    price_prediction = predict(prediction_date)
-      
-    print("Estimated price: ", price_prediction)
-    return price_prediction
+# def search(prediction_date):
+#     train_file = 'data/dji/train.csv'
+#     test_file = 'data/dji/test.csv'
+#
+#     model = create_model(train_file)
+#     test_model(test_file, model)
+#     price_prediction = predict(prediction_date)
+#
+#     print("Estimated price: ", price_prediction)
+#     return price_prediction

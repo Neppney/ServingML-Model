@@ -1,9 +1,14 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    Store & Retrieve
+    Cloud SQL Retrieve
 {% endblock %}
 
 {% block content %}
-    <h1>Store and Retrieve</h1>
+    <h1>Retrieve Database Entries</h1>
+    <ol>
+        {% for entry in entries %}
+            <li>Date: {{ entry.date }} Predicted Price: {{ entry.predicted_price }}</li>
+        {% endfor %}
+    </ol>
 {% endblock %}
