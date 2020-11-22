@@ -72,13 +72,13 @@ def load():
 #    price_prediction = predict(prediction_date)
 #    print("Estimated price: ", price_prediction)
 
-# def search(prediction_date):
-#     train_file = 'data/dji/train.csv'
-#     test_file = 'data/dji/test.csv'
-#
-#     model = create_model(train_file)
-#     test_model(test_file, model)
-#     price_prediction = predict(prediction_date)
-#
-#     print("Estimated price: ", price_prediction)
-#     return price_prediction
+def search(prediction_date):
+    train_file = 'data/dji/train.csv'
+    test_file = 'data/dji/test.csv'
+
+    model = create_model(train_file)
+    test_model(test_file, model)
+    price_prediction = predict(prediction_date)
+
+    print("Estimated price: ", price_prediction)
+    return price_prediction
